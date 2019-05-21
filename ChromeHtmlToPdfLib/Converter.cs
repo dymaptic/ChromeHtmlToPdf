@@ -37,6 +37,7 @@ using System.Threading;
 using ChromeHtmlToPdfLib.Enums;
 using ChromeHtmlToPdfLib.Exceptions;
 using ChromeHtmlToPdfLib.Helpers;
+using System.Threading.Tasks;
 
 namespace ChromeHtmlToPdfLib
 {
@@ -847,7 +848,7 @@ namespace ChromeHtmlToPdfLib
         /// option in the constructor if you want one log for all conversions</param>
         /// <exception cref="ConversionTimedOutException">Raised when <see cref="conversionTimeout"/> is set and the 
         /// conversion fails to finish in this amount of time</exception>
-        public void ConvertToPdf(ConvertUri inputUri,
+        public async Task ConvertToPdf(ConvertUri inputUri,
             Stream outputStream,
             PageSettings pageSettings,
             string waitForWindowStatus = "",
@@ -948,7 +949,7 @@ namespace ChromeHtmlToPdfLib
 
                 Logger.WriteToLog("Converting to PDF");
 
-                using (var memoryStream = new MemoryStream(_browser.PrintToPdf(pageSettings, countdownTimer).GetAwaiter().GetResult().Bytes))
+                using (var memoryStream = new MemoryStream((await _browser.PrintToPdf(pageSettings, countdownTimer)).Bytes))
                 {
                     memoryStream.Position = 0;
                     memoryStream.CopyTo(outputStream);
